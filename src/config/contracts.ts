@@ -1,9 +1,9 @@
-// Deployed SealedAuction contract addresses on Sepolia
+// Deployed SealedAuction contract addresses on Sepolia (60-day duration)
 export const AUCTION_ADDRESSES = [
-  "0xD497337e766C294da42487CFBF2AcA80aB1FA5Db", // First auction (7 days)
-  "0x3d356b2dab25230D08F6cAeb7272876707ca22e6", // Crypto Punk #3100 (7 days)
-  "0x72EF9f21acD3351e7D1B4Ab6138bAb83333dd77D", // Bored Ape #8817 (5 days)
-  "0x77cD2EbeEa9116664eC0eA962C93Fe23b2FbB362", // Azuki #9605 (3 days)
+  "0x7a02D08C90DFfa07Dd68371990d022a7d6726458", // Crypto Punk #3100 (60 days)
+  "0xBD00845DB68840f5Dadd851f4b53796f7BAE2Ff5", // Bored Ape #8817 (60 days)
+  "0x1D3fF32e9558f332BC564A9DAD3cAba7cFcF353c", // Azuki #9605 (60 days)
+  "0x2148AB7afD716754681f96C94eC7E0DDB3215F9f", // Doodles #4620 (60 days)
 ] as const;
 
 export const SEALED_AUCTION_ABI = [
