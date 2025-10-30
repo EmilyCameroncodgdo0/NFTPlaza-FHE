@@ -9,9 +9,10 @@ interface AuctionCardProps {
   endTime: string;
   bidCount: number;
   minBid: string;
+  onBidClick?: () => void;
 }
 
-const AuctionCard = ({ title, image, endTime, bidCount, minBid }: AuctionCardProps) => {
+const AuctionCard = ({ title, image, endTime, bidCount, minBid, onBidClick }: AuctionCardProps) => {
   return (
     <Card className="group overflow-hidden border-border bg-card hover:shadow-[0_0_30px_hsl(220_90%_56%/0.2)] transition-all duration-300">
       <div className="aspect-square overflow-hidden relative">
@@ -49,7 +50,10 @@ const AuctionCard = ({ title, image, endTime, bidCount, minBid }: AuctionCardPro
           </div>
         </div>
         
-        <Button className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity">
+        <Button
+          onClick={onBidClick}
+          className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
+        >
           Place Sealed Bid
         </Button>
       </div>
