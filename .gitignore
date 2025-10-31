@@ -24,3 +24,4 @@ lerna-debug.log*
 cache
 artifacts
 typechain-types
+.vercel

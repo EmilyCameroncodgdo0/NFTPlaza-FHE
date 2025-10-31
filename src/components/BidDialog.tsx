@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import {
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { encryptBidAmount } from '@/lib/fhe';
 import { AUCTION_ADDRESSES, SEALED_AUCTION_ABI } from '@/config/contracts';
+import { toast } from 'sonner';
 
 interface BidDialogProps {
   open: boolean;
@@ -35,22 +36,23 @@ export function BidDialog({ open, onOpenChange, auctionTitle, auctionIndex, minB
 
   const handleSubmit = async () => {
     if (!bidAmount || parseFloat(bidAmount) < parseFloat(minBid)) {
-      alert(`Bid must be at least ${minBid} ETH`);
+      toast.error(`Bid must be at least ${minBid} ETH`);
       return;
     }
 
     if (!address) {
-      alert('Please connect your wallet first');
+      toast.error('Please connect your wallet first');
       return;
     }
 
     if (!contractAddress) {
-      alert('Invalid auction contract address');
+      toast.error('Invalid auction contract address');
       return;
     }
 
     try {
       setIsEncrypting(true);
+      toast.loading('Encrypting bid with FHE...', { id: 'encrypting' });
 
       // Convert ETH to Wei
       const bidWei = parseEther(bidAmount);
@@ -69,6 +71,7 @@ export function BidDialog({ open, onOpenChange, auctionTitle, auctionIndex, minB
       console.log('- Proof:', proof);
 
       setIsEncrypting(false);
+      toast.success('Encryption complete! Submitting bid...', { id: 'encrypting' });
 
       // Submit encrypted bid to contract
       console.log('📤 Submitting bid to contract:', contractAddress);
@@ -83,18 +86,34 @@ export function BidDialog({ open, onOpenChange, auctionTitle, auctionIndex, minB
     } catch (error: any) {
       console.error('❌ Error placing bid:', error);
       setIsEncrypting(false);
-      alert(`Failed to place bid: ${error.message || 'Unknown error'}`);
+      toast.error(`Failed to place bid: ${error.message || 'Unknown error'}`, { id: 'encrypting' });
     }
   };
 
-  // Handle successful transaction
-  if (isSuccess) {
-    setTimeout(() => {
-      onOpenChange(false);
-      setBidAmount('');
-      alert('🎉 Bid placed successfully! Your bid is encrypted and hidden.');
-    }, 500);
-  }
+  // Handle transaction status
+  useEffect(() => {
+    if (isSuccess && hash) {
+      toast.success(
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold">🎉 Bid placed successfully!</p>
+          <p className="text-sm text-muted-foreground">Your bid is encrypted and hidden.</p>
+          <a
+            href={`https://sepolia.etherscan.io/tx/${hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-500 hover:text-blue-600 underline mt-1"
+          >
+            View on Etherscan →
+          </a>
+        </div>,
+        { duration: 5000 }
+      );
+      setTimeout(() => {
+        onOpenChange(false);
+        setBidAmount('');
+      }, 500);
+    }
+  }, [isSuccess, hash, onOpenChange]);
 
   const isSubmitting = isEncrypting || isWritePending || isConfirming;
 
